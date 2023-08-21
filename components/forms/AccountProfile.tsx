@@ -2,22 +2,16 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import Image from 'next/image'
+import { usePathname, useRouter } from 'next/navigation'
 import { ChangeEvent, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
 import { Button } from '@/components/ui/button'
-import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-} from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { updateUser } from '@/lib/actions/user.actions'
 import { useUploadThing } from '@/lib/uploadthing'
 import { isBase64Image } from '@/lib/utils'
 import { UserValidation } from '@/lib/validations/user'
@@ -35,6 +29,8 @@ interface AccountProfileProps {
 }
 
 const AccountProfile = ({ user, btnTitle }: AccountProfileProps) => {
+	const router = useRouter()
+	const pathname = usePathname()
 	const [files, setFiles] = useState<File[]>([])
 	const { startUpload } = useUploadThing('media')
 
@@ -49,27 +45,27 @@ const AccountProfile = ({ user, btnTitle }: AccountProfileProps) => {
 	})
 
 	const handleImage = (e: ChangeEvent<HTMLInputElement>, fieldChange: (value: string) => void) => {
-    e.preventDefault()
-    
-    const fileReader = new FileReader()
+		e.preventDefault()
 
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0]
+		const fileReader = new FileReader()
 
-      setFiles(Array.from(e.target.files))
+		if (e.target.files && e.target.files.length > 0) {
+			const file = e.target.files[0]
 
-      if (!file.type.includes('image')) return
-      
-      fileReader.onload = async (event) => {
-        const imageDataUrl = event.target?.result?.toString() || ''
+			setFiles(Array.from(e.target.files))
 
-        fieldChange(imageDataUrl)
-      }
-      fileReader.readAsDataURL(file)
-    }
+			if (!file.type.includes('image')) return
+
+			fileReader.onload = async (event) => {
+				const imageDataUrl = event.target?.result?.toString() || ''
+
+				fieldChange(imageDataUrl)
+			}
+			fileReader.readAsDataURL(file)
+		}
 	}
 
-	const onSubmit = async(values: z.infer<typeof UserValidation>) => {
+	const onSubmit = async (values: z.infer<typeof UserValidation>) => {
 		const blob = values.profile_photo
 
 		const hasImageChanged = isBase64Image(blob)
@@ -80,7 +76,21 @@ const AccountProfile = ({ user, btnTitle }: AccountProfileProps) => {
 				values.profile_photo = imgRes[0].url
 			}
 		}
-		// TODO: Update user profile
+
+		await updateUser({
+			userId: user.id,
+			username: values.username,
+			name: values.name,
+			image: values.profile_photo,
+			bio: values.bio,
+			path: pathname,
+		})
+
+		if (pathname === '/profile/edit') {
+			router.back()
+		} else {
+			router.push('/')
+		}
 	}
 
 	return (
@@ -112,7 +122,7 @@ const AccountProfile = ({ user, btnTitle }: AccountProfileProps) => {
 									/>
 								)}
 							</FormLabel>
-							<FormControl className="text-base-semibold flex-1 text-gray-200">
+							<FormControl className="flex-1 text-base-semibold text-gray-200">
 								<Input
 									type="file"
 									accept="image/*"
@@ -121,6 +131,7 @@ const AccountProfile = ({ user, btnTitle }: AccountProfileProps) => {
 									onChange={(e) => handleImage(e, field.onChange)}
 								/>
 							</FormControl>
+							<FormMessage />
 						</FormItem>
 					)}
 				/>
@@ -134,6 +145,7 @@ const AccountProfile = ({ user, btnTitle }: AccountProfileProps) => {
 							<FormControl>
 								<Input type="text" className="account-form_input no-focus" {...field} />
 							</FormControl>
+							<FormMessage />
 						</FormItem>
 					)}
 				/>
@@ -147,6 +159,7 @@ const AccountProfile = ({ user, btnTitle }: AccountProfileProps) => {
 							<FormControl>
 								<Input type="text" className="account-form_input no-focus" {...field} />
 							</FormControl>
+							<FormMessage />
 						</FormItem>
 					)}
 				/>
@@ -160,6 +173,7 @@ const AccountProfile = ({ user, btnTitle }: AccountProfileProps) => {
 							<FormControl>
 								<Textarea rows={10} className="account-form_input no-focus" {...field} />
 							</FormControl>
+							<FormMessage />
 						</FormItem>
 					)}
 				/>
