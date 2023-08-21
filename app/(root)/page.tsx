@@ -1,5 +1,3 @@
-<h1 className="head-text text-left">Home</h1>
-
 export default function Home() {
 	return (
 		<>
