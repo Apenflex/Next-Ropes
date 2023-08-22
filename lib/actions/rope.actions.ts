@@ -70,3 +70,66 @@ export async function fetchPosts(pageNumber = 1, pageSize = 20) {
 		throw new Error(`Failed to fetch posts: ${error.message}`)
 	}
 }
+
+export async function fetchRopeById(id: string) {
+	try {
+		connectToDB()
+		// TODO: Populate the Community
+		const rope = await Rope.findById(id)
+			.populate({ path: 'author', model: User, select: '_id id name image' })
+			.populate({
+				path: 'children',
+				populate: [
+					{
+						path: 'author',
+						model: User,
+						select: '_id id name parentId image',
+					},
+					{
+						path: 'children',
+						model: Rope,
+						populate: {
+							path: 'author',
+							model: User,
+							select: '_id id name parentId image',
+						},
+					},
+				],
+			})
+			.exec()
+
+		return rope
+	} catch (error: any) {
+		throw new Error(`Failed to fetch post by id: ${error.message}`)
+	}
+}
+
+export async function addCommentToRope(ropeId: string, commentText: string, userId: string, path: string) {
+	try {
+		connectToDB()
+
+		// Find the original rope by ID
+		const originalRope = await Rope.findById(ropeId)
+		if (!originalRope) throw new Error('Rope not found')
+
+		// Create a new rope with the comment text
+		const commentRope = new Rope({
+			text: commentText,
+			author: userId,
+			parentId: ropeId,
+		})
+
+		// Save the new rope
+		const savedCommentRope = await commentRope.save()
+
+		// Update the original rope to add the new comment
+		originalRope.children.push(savedCommentRope._id)
+
+		// Save the original rope
+		await originalRope.save()
+
+		revalidatePath(path)
+	} catch (error: any) {
+		throw new Error(`Failed to add comment to rope: ${error.message}`)
+	}
+}

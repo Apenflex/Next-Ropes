@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Textarea } from '@/components/ui/textarea'
 import { createRope } from '@/lib/actions/rope.actions'
-// import { updateUser } from '@/lib/actions/user.actions'
 import { RopeValidation } from '@/lib/validations/rope'
 
 const PostRope = ({ userId }: { userId: string }) => {

@@ -11,12 +11,10 @@ export default async function Page() {
   const userInfo = await fetchUser(user.id)
   if (!userInfo?.onboarded) redirect('/onboarding')
   
-  const userId = userInfo._id.toString()
-  
 	return (
 		<>
 			<h1 className="head-text">Create Rope</h1>
-			<PostRope userId={userId} />
+			<PostRope userId={JSON.stringify(userInfo._id)} />
 		</>
 	)
 }
