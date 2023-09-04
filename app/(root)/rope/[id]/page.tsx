@@ -35,7 +35,7 @@ export default async function Page({ params }: { params: { id: string } }) {
 				<Comment
 					ropeId={rope.id}
 					currentUserImg={userInfo.image}
-					currentUserId={JSON.stringify(userInfo._id)}
+					currentUserId={userInfo._id.toString()}
 				/>
 			</div>
 

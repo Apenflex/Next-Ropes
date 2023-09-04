@@ -45,7 +45,7 @@ export default async function Page({ params }: { params: { id: string } }) {
               <RopesTab
                 currentUserId={user.id}
                 accountId={userInfo.id}
-                accoutType="User"
+                accountType="User"
               />
 						</TabsContent>
 					))}

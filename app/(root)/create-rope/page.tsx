@@ -14,7 +14,7 @@ export default async function Page() {
 	return (
 		<>
 			<h1 className="head-text">Create Rope</h1>
-			<PostRope userId={JSON.stringify(userInfo._id)} />
+			<PostRope userId={userInfo._id.toString()} />
 		</>
 	)
 }

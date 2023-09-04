@@ -78,12 +78,12 @@ const AccountProfile = ({ user, btnTitle }: AccountProfileProps) => {
 		}
 
 		await updateUser({
-			userId: user.id,
-			username: values.username,
 			name: values.name,
-			image: values.profile_photo,
-			bio: values.bio,
 			path: pathname,
+			username: values.username,
+			userId: user.id,
+			bio: values.bio,
+			image: values.profile_photo,
 		})
 
 		if (pathname === '/profile/edit') {

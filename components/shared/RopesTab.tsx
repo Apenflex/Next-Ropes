@@ -1,16 +1,23 @@
 import { redirect } from 'next/navigation'
 
 import RopeCard from '@/components/cards/RopeCard'
+import { fetchCommunityPosts } from '@/lib/actions/community.actions'
 import { fetchUserPosts } from '@/lib/actions/user.actions'
 
 interface RopesTabProps {
 	currentUserId: string
 	accountId: string
-	accoutType: string
+	accountType: string
 }
 
-const RopesTab = async ({ currentUserId, accountId, accoutType }: RopesTabProps) => {
-	let res = await fetchUserPosts(accountId)
+const RopesTab = async ({ currentUserId, accountId, accountType }: RopesTabProps) => {
+	console.log(accountType)
+	let res: any
+	if (accountType === 'Community') {
+		res = await fetchCommunityPosts(accountId)
+	} else {
+		res = await fetchUserPosts(accountId)
+	}
 	if (!res) redirect('/')
 
 	return (
@@ -23,7 +30,7 @@ const RopesTab = async ({ currentUserId, accountId, accoutType }: RopesTabProps)
 					parentId={rope.parentId}
 					content={rope.text}
 					author={
-						accoutType === 'User'
+						accountType === 'User'
 							? { name: res.name, image: res.image, id: res.id }
 							: { name: rope.author.name, image: rope.author.image, id: rope.author.id }
 					}

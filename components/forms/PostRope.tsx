@@ -1,5 +1,6 @@
 'use client'
 
+import { useOrganization } from '@clerk/nextjs'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { usePathname, useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
@@ -14,6 +15,7 @@ import { RopeValidation } from '@/lib/validations/rope'
 const PostRope = ({ userId }: { userId: string }) => {
 	const router = useRouter()
 	const pathname = usePathname()
+	const { organization } = useOrganization()
 
 	const form = useForm({
 		resolver: zodResolver(RopeValidation),
@@ -27,7 +29,7 @@ const PostRope = ({ userId }: { userId: string }) => {
 		await createRope({
 			text: values.rope,
 			author: userId,
-			communityId: null,
+			communityId: organization ? organization.id : null,
 			path: pathname,
     })
     
